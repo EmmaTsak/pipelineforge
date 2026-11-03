@@ -1,3 +1,4 @@
+
 pipeline {
 
     agent {
@@ -11,7 +12,7 @@ pipeline {
     }
 
     stages {
-        
+
         stage('Checkout') {
             steps {
                 checkout scm
@@ -35,18 +36,18 @@ pipeline {
             }
         }
 
-        stage('Unit Test') {
+        stage('Unit Tests') {
             steps {
                 dir('services/pipelineforge-api') {
                     sh './gradlew --no-daemon test'
                 }
             }
-        }
 
-        post {
-            always {
-                junit testResults: 
-                'services/pipelineforge-api/build/test-results/test/*.xml'
+            post {
+                always {
+                    junit testResults:
+                        'services/pipelineforge-api/build/test-results/test/*.xml'
+                }
             }
         }
 
@@ -71,7 +72,7 @@ pipeline {
         }
 
         failure {
-            echo 'PipelineForge failed. Check the console output.'
+            echo 'Pipeline failed. Check the console output.'
         }
     }
 }
