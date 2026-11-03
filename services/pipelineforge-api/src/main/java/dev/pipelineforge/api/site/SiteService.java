@@ -34,7 +34,7 @@ public class SiteService {
         SiteResponse newSite = new SiteResponse(
             id,
             name.trim(),
-            "UNKOWN"
+            "UNKNOWN"
         );
 
         sites.add(newSite);
