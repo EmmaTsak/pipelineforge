@@ -14,6 +14,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import org.springframework.http.MediaType;
+
 @WebMvcTest(SiteController.class)
 class SiteControllerTest {
 
@@ -48,4 +52,40 @@ class SiteControllerTest {
             .andExpect(jsonPath("$[0].status").value("ONLINE"))
             .andExpect(jsonPath("$[1].status").value("OFFLINE"));
     }
+
+    
+    @Test
+    void shouldRegisterSite() throws Exception {
+
+        SiteResponse created = new SiteResponse(
+            "galway-01",
+            "Galway Site 01",
+            "UNKNOWN"
+        );
+
+        when(siteService.registerSite("Galway Site 01"))
+            .thenReturn(created);
+
+        mockMvc.perform(post("/api/sites")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {"name": "Galway Site 01"}
+                    """))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.id").value("galway-01"))
+            .andExpect(jsonPath("$.name").value("Galway Site 01"))
+            .andExpect(jsonPath("$.status").value("UNKNOWN"));
+    }
+
+    @Test
+    void shouldRejectBlankSiteName() throws Exception {
+
+        mockMvc.perform(post("/api/sites")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {"name": ""}
+                    """))
+            .andExpect(status().isBadRequest());
+    }
+
 }
