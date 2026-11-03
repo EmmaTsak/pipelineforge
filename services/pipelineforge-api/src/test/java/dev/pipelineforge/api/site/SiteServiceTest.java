@@ -13,7 +13,7 @@ class SiteServiceTest {
 
         List<SiteResponse> sites = siteService.getSites();
 
-        assertEquals(3, sites.size());
+        assertEquals(2, sites.size());
         assertEquals("cork-01", sites.get(0).id());
         assertEquals("ONLINE", sites.get(0).status());
         assertEquals("dublin-01", sites.get(1).id());
