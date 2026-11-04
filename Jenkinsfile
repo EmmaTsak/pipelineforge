@@ -58,9 +58,52 @@ pipeline {
                 }
             }
         }
+
+        stage('Build Docker Image') {
+
+            agent {
+                label 'docker-builder'
+            }
+
+            steps {
+                checkout scm
+
+                sh 'docker info --format "{{.ServerVersion}}"'
+
+                dir('services/pipelineforge-api') {
+                    sh '''
+                        set -eu
+
+                         SHA=$(git rev-parse --short=12 HEAD)
+                        TAG="pipelineforge-api:ci-${BUILD_NUMBER}-${SHA}"
+
+                        echo "Building image: $TAG"
+
+                        docker build -t "$TAG" .
+
+                        docker image inspect "$TAG" \
+                            --format '{{.Id}}' > ci-image-id.txt
+
+                        printf '%s\\n' "$TAG" > ci-image-tag.txt
+                    '''
+                }
+
+                archiveArtifacts(
+                    artifacts: 'services/pipelineforge-api/ci-image-id.txt',
+                    fingerprint: true
+                )
+            }
+        }
     }
 
     post {
+
+         always {
+            junit(
+                testResults: 'services/pipelineforge-api/build/test-results/test/*.xml',
+                allowEmptyResults: true
+            )
+        }
 
         success {
             archiveArtifacts(
