@@ -94,6 +94,28 @@ pipeline {
                 )
             }
         }
+
+        stage('Smoke Test Docker Image') {
+
+            agent {
+                label 'docker-builder'
+            }
+
+            steps {
+                checkout scm
+
+                sh '''
+                    set -eu
+
+                    SHA=$(git rev-parse --short=12 HEAD)
+                    TAG="pipelineforge-api:ci-${BUILD_NUMBER}-${SHA}"
+
+                    echo "Smoke testing image: $TAG"
+
+                    bash scripts/smoke-test-image.sh "$TAG"
+                '''
+            }
+        }
     }
 
     post {
