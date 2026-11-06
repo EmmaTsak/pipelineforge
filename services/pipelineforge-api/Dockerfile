@@ -21,13 +21,8 @@ COPY --from=build \
     /workspace/build/libs/pipelineforge-api-0.0.1-SNAPSHOT.jar \
     /app/app.jar
 
-
 USER 10001:10001
 
 EXPOSE 8080
 
-# Deliberate fault for the CI experiment
-ENV MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_EXCLUDE=health
-
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
-
