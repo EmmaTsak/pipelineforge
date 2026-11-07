@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: pipelineforge-api
+  namespace: pipelineforge
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: pipelineforge-api
+
+  template:
+    metadata:
+      labels:
+        app: pipelineforge-api
+
+    spec:
+      containers:
+        - name: pipelineforge-api
+          image: pipelineforge-api:k8s-v1
+          imagePullPolicy: Never
+
+          ports:
+            - name: http
+              containerPort: 8080
+
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            periodSeconds: 5
+            failureThreshold: 30
+
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            periodSeconds: 5
+
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            periodSeconds: 15
+
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "768Mi"
+              cpu: "1000m"
+
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
