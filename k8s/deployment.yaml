@@ -22,11 +22,6 @@ spec:
     matchLabels:
       app: pipelineforge-api
 
-
-  selector:
-    matchLabels:
-      app: pipelineforge-api
-
   template:
     metadata:
       labels:
